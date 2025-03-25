@@ -12,7 +12,7 @@ see more [here](https://elixir-lang.org/getting-started/pattern-matching.html).
 
 ```elixir
 x = 1
-# x = 2
+x = 2
 # x
 # ^x = 2
 ```
@@ -164,9 +164,9 @@ devices = [
 ]
 
 ## I want to know what type of divices are used  
-# devices
-# |> Enum.map(fn %{:type => type} -> type end)
-# |> Enum.uniq()
+devices
+|> Enum.map(fn %{:type => type} -> type end)
+|> Enum.uniq()
 
 ## I want to see the windows running divices
 # devices

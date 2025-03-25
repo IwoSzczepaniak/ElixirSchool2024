@@ -6,9 +6,8 @@ Write functions `sum(n)` that uses recursion to calculate the sum of integers fr
 
 ```elixir
 defmodule Recursive do
-  def sum(_n) do
-    # Your code here
-  end
+  def sum(0), do: 0
+  def sum(n), do: n + sum(n - 1)
 end
 ```
 
@@ -30,8 +29,20 @@ Tip: see [How to use div/2 and/or rem/2?](https://elixir-lang.org/getting-starte
 
 ```elixir
 defmodule FizzBuzz do
-  def fizzbuzz(_n) do
-    # Your code here
+  def fizzbuzz(0), do: []
+  
+  def fizzbuzz(n) when n > 0 do
+    1..n
+    |> Enum.map(&fizzbuzz_value/1)
+  end
+
+  defp fizzbuzz_value(x) do
+    cond do
+      rem(x, 3) == 0 and rem(x, 5) == 0 -> :fizzbuzz
+      rem(x, 3) == 0 -> :fizz
+      rem(x, 5) == 0 -> :buzz
+      true -> x
+    end
   end
 end
 ```
@@ -97,8 +108,23 @@ Tip: You may find [String.graphemes/1](https://hexdocs.pm/elixir/String.html#gra
 
 ```elixir
 defmodule Scrabble do
-  def calculate_score(_word) do
-    # Your code here
+  def calculate_score(word) do
+    String.graphemes(word)
+    |> Enum.map(&scrabble_score(&1))
+    |> Enum.reduce(0, fn x, acc -> x + acc end)
+  end
+
+  defp scrabble_score(letter) do
+    cond do
+      letter in ~w(a e i o u l n r s t) -> 1
+      letter in ~w(d g) -> 2
+      letter in ~w(b c m p) -> 3
+      letter in ~w(f h v w y) -> 4
+      letter == "k" -> 5
+      letter in ~w(j x) -> 8
+      letter in ~w(q z) -> 10
+      true -> 0
+    end
   end
 end
 ```

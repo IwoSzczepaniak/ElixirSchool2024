@@ -11,6 +11,15 @@ defmodule Exercises.Exercise5 do
     mix test --only test5
   """
   def selective_receive() do
-    # write your code here
+    pid = spawn(fn ->
+      Process.register(self(), :hello)
+      receive do
+        :world -> send(:test, :world)
+      end
+      receive do
+        :hello -> send(:test, :hello)
+      end
+    end)
+    pid
   end
 end

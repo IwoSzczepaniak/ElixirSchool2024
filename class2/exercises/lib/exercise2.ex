@@ -10,6 +10,10 @@ defmodule Exercises.Exercise2 do
     mix test --only test2
   """
   def create_registered_process() do
-    # write your code here
+    pid = spawn(fn ->
+      Process.register(self(), :hello)
+      Process.sleep(1000)
+    end)
+    pid
   end
 end

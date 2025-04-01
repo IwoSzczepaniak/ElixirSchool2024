@@ -8,6 +8,8 @@ defmodule Exercises.Exercise1 do
     mix test --only test1
   """
   def send_to_pong() do
-    # write your code here
+    spawn(fn ->
+      send(:ping, :pong)
+    end)
   end
 end

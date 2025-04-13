@@ -11,10 +11,35 @@ defmodule Exercises.Exercise9 do
     mix test --only test9
   """
   def server() do
-    # write your code here
+    spawn(fn -> server_loop() end)
+  end
+
+  defp server_loop() do
+    Process.flag(:trap_exit, true)
+
+    if Process.whereis(:server) == nil do
+      Process.register(self(), :server)
+    end
+
+    receive do
+      {:EXIT, _from, _reason} ->
+        send(:test, :handle_exit)
+        server_loop()
+
+      message ->
+        send(:test, message)
+        server_loop()
+    after
+      500 ->
+        send(:test, :nothing_todo)
+        server_loop()
+    end
   end
 
   def client() do
-    # write your code here
+    pid =
+      spawn(fn ->
+        Enum.each(1..10, fn _ -> send(:server, :nothing_todo) end)
+      end)
   end
 end

@@ -1,12 +1,12 @@
 defmodule Exercises.Exercise7 do
   @doc """
-   - Spawn a new process, 
-     - register it under :world name, 
+   - Spawn a new process,
+     - register it under :world name,
      - link to :hello process
      - after 1 second send :bad_msg to :hello process
      - wait for next message
-   - spawn a new unregistered process, 
-      - wait 1500ms 
+   - spawn a new unregistered process,
+      - wait 1500ms
       - check if process :world is alive and:
         - send to :test process ":world is alive!" if process :world is alive
         - send to :test process ":world is dead!" otherwise
@@ -29,6 +29,27 @@ defmodule Exercises.Exercise7 do
 
     Process.register(pid_hello, :hello)
 
-    # write here your code
+    _world = spawn(fn ->
+      Process.register(self(), :world)
+      Process.link(pid_hello)
+      Process.sleep(1000)
+      send(pid_hello, :bad_msg)
+      receive do
+        _msg -> :ok
+      end
+    end)
+
+    unregistered = spawn(fn ->
+      pid_world = Process.whereis(:world)
+      Process.sleep(1500)
+
+      if Process.alive?(pid_world) do
+        send(:test, ":world is alive!")
+      else
+        send(:test, ":world is dead!")
+      end
+    end)
+
+    unregistered
   end
 end

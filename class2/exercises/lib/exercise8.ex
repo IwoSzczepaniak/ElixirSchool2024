@@ -23,6 +23,34 @@ defmodule Exercises.Exercise8 do
 
     Process.register(pid_hello, :hello)
 
-    # write here your code
+    _world = spawn(fn ->
+      Process.register(self(), :world)
+      Process.flag(:trap_exit, true)
+      Process.link(pid_hello)
+      Process.sleep(1000)
+      send(pid_hello, :bad_msg)
+
+      receive do
+        exit = {:EXIT, _pid, _reason} ->
+          send(:test, exit)
+      end
+
+      receive do
+        _msg -> :ok
+      end
+      end)
+
+    unregistered = spawn(fn ->
+      pid_world = Process.whereis(:world)
+      Process.sleep(1500)
+
+      if Process.alive?(pid_world) do
+        send(:test, ":world is alive!")
+      else
+        send(:test, ":world is dead!")
+      end
+    end)
+
+    unregistered
   end
 end

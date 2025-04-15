@@ -14,8 +14,9 @@ defmodule PhoenixHello.Receiver do
     Function that sends msg to Receiver process started on connected node.
   """
   def send_msg(msg) do
-    [node | _] = Node.list()
-    send({PhoenixHello.Receiver, node}, msg)
+    pid = :global.whereis_name(__MODULE__)
+    IO.inspect("Receiver pid: #{inspect(pid)}")
+    send(pid, msg)
   end
 
   @doc """
@@ -25,8 +26,10 @@ defmodule PhoenixHello.Receiver do
   def send_msg_to_all_nodes(msg) do
     node_list = Node.list()
 
+    pid = :global.whereis_name(__MODULE__)
+    IO.inspect("Receiver pid: #{inspect(pid)}")
     [Node.self() | node_list]
-    |> Enum.each(fn node -> send({PhoenixHello.Receiver, node}, msg) end)
+    |> Enum.each(fn _node -> GenServer.call(pid, {msg, Node.self()}) end)
   end
 
   @impl GenServer

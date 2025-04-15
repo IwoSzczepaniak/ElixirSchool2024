@@ -13,13 +13,14 @@ defmodule PhoenixHello.Receiver do
   @doc """
     Function that sends msg to Receiver process started on connected node.
   """
-  def send_msg(_msg) do
-    # write your code here
+  def send_msg(msg) do
+    [node | _] = Node.list()
+    send({PhoenixHello.Receiver, node}, msg)
   end
 
   @doc """
     Function that sends msg to all Receiver processes in a cluster including the node from which msg was sent
-    and returns list of responses from nodes. 
+    and returns list of responses from nodes.
   """
   def send_msg_to_all_nodes(_msg) do
     # write your code here

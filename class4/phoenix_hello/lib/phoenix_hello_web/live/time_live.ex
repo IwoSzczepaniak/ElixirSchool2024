@@ -3,7 +3,7 @@ defmodule PhoenixHelloWeb.TimeLive do
 
   def render(assigns) do
     ~H"""
-    <span><%= @timer_value %></span>
+    <span>{@timer_value}</span>
 
     <br />
     <button class="button" phx-click="start_managers">Start Managers!</button>
@@ -11,7 +11,7 @@ defmodule PhoenixHelloWeb.TimeLive do
     <br />
     <ul>
       <%= for item <- @list_of_running_managers do %>
-        <li><%= item %></li>
+        <li>{item}</li>
       <% end %>
     </ul>
     """
@@ -23,7 +23,7 @@ defmodule PhoenixHelloWeb.TimeLive do
 
     socket =
       socket
-      |> assign(:timer_value, DateTime.utc_now())
+      |> assign(:timer_value, get_time())
       |> assign(:list_of_running_managers, list_of_running_managers)
       |> assign(:button_clicked, false)
 
@@ -38,7 +38,7 @@ defmodule PhoenixHelloWeb.TimeLive do
   end
 
   def handle_event("start_managers", _params, socket) do
-    list_of_running_managers = PhoenixHello.ManagerSupervisor.start_random()
+    list_of_running_managers = PhoenixHello.ManagerSupervisor.start_random() |> Enum.sort()
 
     socket = assign(socket, :list_of_running_managers, list_of_running_managers)
     # Perform any desired actions when the button is clicked
@@ -54,14 +54,16 @@ defmodule PhoenixHelloWeb.TimeLive do
 
   # Helper function to update LiveView state
   defp update_timer(socket) do
-    new_state = %{timer_value: DateTime.utc_now()}
+    new_state = %{timer_value: get_time()}
     assign(socket, new_state)
   end
 
   defp list_of_running_managers() do
-    Horde.DynamicSupervisor.which_children(PhoenixHello.ManagerSupervisor)
-    |> Enum.map(fn {_, pid, _, _} ->
-      PhoenixHello.Manager.get_name(pid)
-    end)
+    Horde.Registry.select(PhoenixHello.DistributedRegistry, [{{:"$1", :_, :_}, [], [:"$1"]}])
+    |> Enum.sort()
+  end
+
+  def get_time do
+    DateTime.utc_now() |> DateTime.truncate(:second)
   end
 end

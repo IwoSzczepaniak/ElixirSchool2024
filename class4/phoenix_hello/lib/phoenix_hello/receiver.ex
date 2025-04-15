@@ -22,8 +22,11 @@ defmodule PhoenixHello.Receiver do
     Function that sends msg to all Receiver processes in a cluster including the node from which msg was sent
     and returns list of responses from nodes.
   """
-  def send_msg_to_all_nodes(_msg) do
-    # write your code here
+  def send_msg_to_all_nodes(msg) do
+    node_list = Node.list()
+
+    [Node.self() | node_list]
+    |> Enum.each(fn node -> send({PhoenixHello.Receiver, node}, msg) end)
   end
 
   @impl GenServer

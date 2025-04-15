@@ -69,7 +69,7 @@ defmodule PhoenixHello.ManagerSupervisor do
 
     Enum.map(names, fn name ->
       # TODO exercise8  start it under distributed supervisor
-      PhoenixHello.Manager.start_link(name)
+      start_manager(name)
       name
     end)
   end

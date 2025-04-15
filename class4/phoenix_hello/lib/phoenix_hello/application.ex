@@ -9,12 +9,12 @@ defmodule PhoenixHello.Application do
   def start(_type, _args) do
     # exercise7: setup libcluster strategy that automatically connects node on localhost
     # https://hexdocs.pm/libcluster/readme.html#strategy-configuration
-    # topologies = [
-    #   example: [
-    #     strategy: choose_strategy,
-    #     config: [timeout: 1000]
-    #   ]
-    # ]
+    topologies = [
+      example: [
+        strategy: Cluster.Strategy.LocalEpmd,
+        config: [timeout: 1000]
+      ]
+    ]
 
     children = [
       PhoenixHelloWeb.Telemetry,
@@ -23,11 +23,11 @@ defmodule PhoenixHello.Application do
       # Start the Finch HTTP client for sending emails
       {Finch, name: PhoenixHello.Finch},
       # exercise7: uncomment
-      # {Cluster.Supervisor, [topologies, [name: PhoenixHello.ClusterSupervisor]]},
+      {Cluster.Supervisor, [topologies, [name: PhoenixHello.ClusterSupervisor]]},
       # exercice6: uncomment Horde.Registry & PhoenixHello.ManagerSupervisor
-      # {Horde.Registry, [name: PhoenixHello.DistributedRegistry, keys: :unique, members: :auto]},
-      # {PhoenixHello.ManagerSupervisor,
-      #  strategy: :one_for_one, members: :auto, process_redistribution: :active},
+      {Horde.Registry, [name: PhoenixHello.DistributedRegistry, keys: :unique, members: :auto]},
+      {PhoenixHello.ManagerSupervisor,
+       strategy: :one_for_one, members: :auto, process_redistribution: :active},
       # Start a worker by calling: PhoenixHello.Worker.start_link(arg)
       # {PhoenixHello.Worker, arg},
       # Start to serve requests, typically the last entry
